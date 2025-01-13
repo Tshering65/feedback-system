@@ -1,0 +1,39 @@
+/* FeedbackDashboard.css */
+.dashboard-container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.service-select {
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: red;
+  font-size: 16px;
+}
+
+.feedback-stats {
+  margin-top: 20px;
+}
+
+.stat {
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.stat h3 {
+  margin: 0;
+}
+
+.stat ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.stat ul li {
+  margin-bottom: 5px;
+}
