@@ -33,6 +33,11 @@ app.use(
 // Explicitly handle OPTIONS (preflight) requests
 app.options('*', cors());
 
+app.use((req, res, next) => {
+  console.log("Request headers:", req.headers);
+  next();
+});
+
 
 app.use(express.json());
 app.use(bodyParser.json());
