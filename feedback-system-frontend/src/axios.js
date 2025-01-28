@@ -9,3 +9,4 @@ axios.get("http://localhost:5000/api", {
   .catch(error => {
     console.error("Error fetching data:", error);
   });
+export default instance;
