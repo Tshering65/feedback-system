@@ -16,7 +16,7 @@ const AdminLogin = ({ onLogin = () => {} }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("https://nppf-feedback-system.vercel.app/api/admin/login", {
+      const response = await axios.get("https://nppf-feedback-system.vercel.app/api/admin/login", {
         email: adminData.email,
         password: adminData.password,
       },{

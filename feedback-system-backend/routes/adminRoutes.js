@@ -22,7 +22,7 @@ router.post(
   upload.single("profilePicture"),
   adminController.register
 );
-router.post("/login", adminController.login);
+router.get("/login", adminController.login);
 router.get("/profile/:email", adminController.getProfile);
 router.put(
   "/update-admin-profile",
