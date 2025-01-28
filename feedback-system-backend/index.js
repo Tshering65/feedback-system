@@ -17,20 +17,22 @@ const allowedOrigins = [
   "https://nppf-feedback-system-j7lqnc9y4-developers-projects-b07dc10f.vercel.app", // Deployed frontend
 ];
 
-// CORS Configuration to allow specific origins
+// CORS Configuration should be one of the first middlewares
 app.use(
   cors({
     origin: function (origin, callback) {
       if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-        // Allow requests with no origin (like mobile apps or curl requests)
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true, // Allow cookies to be sent with requests
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
 
 app.use(express.json());
 app.use(bodyParser.json());
