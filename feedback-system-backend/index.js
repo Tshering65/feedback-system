@@ -13,8 +13,8 @@ const PORT = process.env.PORT || 5000;
 
 // Allowed Origins (Add your deployed frontend domain here)
 const allowedOrigins = [
-  "http://localhost:3000", // Local development frontend
-  "https://nppf-feedback-system-j7lqnc9y4-developers-projects-b07dc10f.vercel.app", // Deployed frontend
+  "http://localhost:3000", // Local frontend
+  "https://nppf-feedback-system.vercel.app", // Production frontend
 ];
 
 // CORS Configuration should be one of the first middlewares
