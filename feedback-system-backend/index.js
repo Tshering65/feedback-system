@@ -11,13 +11,13 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Define the allowed origins
+// Allowed Origins (Add your deployed frontend domain here)
 const allowedOrigins = [
   "http://localhost:3000", // Local development frontend
-  "https://nppf-feedback-system-7nmi8aj75-developers-projects-b07dc10f.vercel.app", // Deployed frontend
+  "https://nppf-feedback-system-j7lqnc9y4-developers-projects-b07dc10f.vercel.app", // Deployed frontend
 ];
 
-// CORS Configuration
+// CORS Configuration to allow specific origins
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -28,16 +28,16 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true,
+    credentials: true, // Allow cookies to be sent with requests
   })
 );
 
 app.use(express.json());
+app.use(bodyParser.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB Connection
 const mongoURI = process.env.MONGO_URI;
-
 if (!mongoURI) {
   console.error("❌ MONGO_URI is not defined in .env file.");
   process.exit(1);
@@ -47,7 +47,7 @@ mongoose
   .connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 30000, // Increase to 30 seconds
+    serverSelectionTimeoutMS: 30000, // Increase timeout
   })
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => {
@@ -55,8 +55,8 @@ mongoose
     process.exit(1); // Exit process on connection failure
   });
 
+// API Routes
 app.use("/api/feedback", feedbackRoutes);
-app.use(bodyParser.json());
 app.use("/api/admin", adminRoutes);
 
 // Root Route
@@ -64,6 +64,7 @@ app.get("/", (req, res) => {
   res.send("Feedback System Backend is Running 🚀");
 });
 
+// Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
