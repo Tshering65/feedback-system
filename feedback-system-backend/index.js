@@ -11,32 +11,10 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      const allowedOrigins = [
-        "http://localhost:3000", // Local development frontend
-        "https://nppf-feedback-system.vercel.app", // Deployed frontend
-      ];
-      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true, // Allow cookies to be sent with requests
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
-
-// Explicitly handle OPTIONS (preflight) requests
-app.options('*', cors());
-
-app.use((req, res, next) => {
-  console.log("Request headers:", req.headers);
-  next();
-});
+app.use(cors({
+  origin: 'https://nppf-feedback-system.vercel.app/',
+  credentials: true
+}));
 
 
 app.use(express.json());

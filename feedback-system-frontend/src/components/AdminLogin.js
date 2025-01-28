@@ -16,7 +16,12 @@ const AdminLogin = ({ onLogin = () => {} }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/admin/login", adminData);
+      const response = await axios.post("https://nppf-feedback-system.vercel.app/api/admin-login", {
+        email: adminData.email,
+        password: adminData.password,
+      },{
+        withCredentials: true ,
+      });
       console.log("Login Response:", response.data); // Debugging
 
       toast.success("Login Successful!");
