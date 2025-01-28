@@ -1,0 +1,157 @@
+/* General Styles for Service Selection */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap");
+
+* {
+  font-family: "Poppins", sans-serif;
+}
+
+.service-selection {
+  min-height: 100vh; /* Full page height */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+/* Header Styles */
+.service-header {
+  color: white;
+  text-align: center;
+  position: relative;
+  box-sizing: border-box;
+  padding-top: 0px; /* Adjust to prevent logo from sticking to the top */
+}
+
+/* Logo Styles */
+.service-header .service-logo {
+  position: fixed;
+  top: 15px;
+  left: 0px; /* Adjusted for better visibility */
+  height: 40px;
+  width: auto;
+  z-index: 10;
+}
+
+/* Header Title */
+.service-title {
+  background-color: #37b7c3;
+  color: white;
+  padding: 15px;
+  font-size: 22px;
+  margin: 0;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* Admin Login Button */
+.admin-login-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  padding: 10px 20px;
+  background-color: #37b7c3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.admin-login-btn:hover {
+  background-color: #00577a;
+}
+
+/* Service Description */
+.service-description {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 20px 0;
+  text-align: center; /* Center the text */
+}
+
+/* Service Icons */
+.service-icons {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+/* Individual icon styles */
+.service-icon {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: inline-block;
+}
+
+.service-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.service-icon img {
+  width: 130px;
+  height: 95px;
+  margin-bottom: 10px;
+}
+
+.service-icon span {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #37b7c3;
+}
+
+/* Footer Styles */
+.service-footer {
+  background-color: #37b7c3;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.service-footer p {
+  margin: 5px 0;
+}
+
+.service-footer .service-locations {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 10px;
+}
+
+.service-footer .service-locations div {
+  background-color: white;
+  color: #37b7c3;
+  padding: 5px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* Admin Login Button Styles */
+.service-selection .admin-login-button {
+  position: absolute; /* Position it relative to the nearest positioned ancestor */
+  top: 12px; /* Distance from the top */
+  right: 20px; /* Distance from the right */
+  padding: 10px 20px;
+  background-color: #37b7c3;
+  color: white;
+  border: 1px solid white;
+  border-radius: 15px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.service-selection .admin-login-button:hover {
+  background-color: #071952;
+}

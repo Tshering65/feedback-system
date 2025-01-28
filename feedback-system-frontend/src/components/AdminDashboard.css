@@ -1,0 +1,454 @@
+.dashboardContainer {
+  display: flex;
+  flex-direction: row; /* Layout side-by-side: Sidebar on the left, main content on the right */
+  min-height: 100vh;
+}
+
+.headerBar {
+  width: 100%;
+  background-color: #37b7c3;
+  color: white;
+  padding: 10px 20px; /* Add more padding on left/right */
+  display: flex;
+  justify-content: space-between; /* Space out the logo and profile */
+  height: 60px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.service-logo {
+  width: 200px;
+  height: 45px;
+  margin-top: 25px;
+  margin-left: -5px;
+}
+
+.profileSection {
+  position: relative;
+  margin-right: 10px;
+}
+
+.profileButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.profileImage {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 12px;
+  margin-top: -5px;
+}
+
+.profileDropdown {
+  position: absolute;
+  top: 50px;
+  right: 15px;
+  background-color: #fff;
+  color: black;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  width: 220px;
+}
+
+.profileDropdown p {
+  margin-right: 0;
+}
+
+.updateButton,
+.logoutButton {
+  margin-top: 10px;
+  padding: 5px;
+  width: 40%;
+  border-radius: 10px;
+}
+
+.updateButton {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.logoutButton {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.sidebar {
+  width: 190px;
+  background-color: #37b7c3;
+  padding: 15px;
+  height: 100vh;
+  position: fixed;
+  top: 45px; /* Adjusted to account for the fixed header */
+  left: 0;
+}
+
+.serviceLink {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  font-size: 19px;
+  margin: 30px 0;
+  width: 175px;
+
+}
+
+.serviceLink:hover {
+  background-color: #071952;
+}
+
+.sidebar ul {
+  list-style-type: none; /* Removes bullet points */
+  padding: 0; /* Removes any default padding */
+}
+
+.mainContent {
+  margin-left: 270px; /* Increased left margin to give space for the sidebar */
+  padding: 20px;
+  margin-top: 60px; /* Added margin to push content down below the header */
+}
+
+.serviceBoxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 33px;
+  margin-top: 20px;
+}
+
+.serviceBox {
+  width: 45%;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.serviceImage {
+  width: 100px;
+  height: 80px;
+  margin-bottom: 10px;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 2px; /* Decreased the top value to reduce the overlay height */
+  left: 750px;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  height: auto; /* Let the height adjust automatically */
+  align-items: center;
+  z-index: 1000; /* Ensure the modal is above other content */
+  animation: fadeIn 0.3s ease-out; /* Animation for the modal appearance */
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Form container styling */
+.updateForm {
+  background: #ffffff;
+  padding: 15px; /* Decreased padding to reduce height */
+  width: 100%;
+  max-width: 450px; /* Max width of the form */
+  text-align: left;
+  position: relative;
+  border-radius: 12px; /* Slightly rounded corners */
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.5s ease-out; /* Form entry animation */
+}
+
+/* Slide-in Animation */
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Close button (X) */
+.updateForm .closeButton {
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: black;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.updateForm .closeButton:hover {
+  color: RED; /* Change color on hover */
+}
+
+/* Title styling */
+.updateForm h3 {
+  margin-bottom: -50px; /* Decreased margin to reduce space between title and form */
+  font-size: 1.6em;
+  color: black;
+  font-weight: 600;
+}
+
+/* Label styling */
+.updateForm label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Input fields */
+.updateForm input {
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #ddd;
+  border-radius: 10px; /* Rounded input fields */
+  font-size: 16px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+/* Focus effect on input */
+.updateForm input:focus {
+  border-color: #4caf50; /* Green border on focus */
+  outline: none;
+}
+
+/* Button styling */
+.updateForm .submitButton {
+  background-color: #088395;
+  color: white;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 30%;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Hover effect for the submit button */
+.updateForm .submitButton:hover {
+  background-color: #071952;
+}
+
+/* Disable state for the submit button */
+.updateForm .submitButton:disabled {
+  background-color: #bbb;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .updateForm {
+    padding: 20px;
+  }
+
+  .updateForm .submitButton {
+    font-size: 1em;
+  }
+}
+
+/* Container for all boxes */
+.emoji-serviceBoxes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+/* Separate the top and bottom boxes */
+.topBoxes,
+.bottomBoxes {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+/* Each individual emoji box */
+.emojiBox {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 25px;
+  width: 100%; /* Increased width */
+  height: 180px; /* Fixed height to keep all boxes the same size */
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Centering content properly */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Hover effect */
+.emojiBox:hover {
+  transform: translateY(-5px); /* Moves the box slightly up */
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2); /* Enhances shadow effect */
+}
+
+/* Emoji size and positioning */
+.emoji {
+  font-size: 45px; /* Adjust emoji size */
+  margin-bottom: 8px; /* Space between emoji and text */
+}
+
+/* Feedback text styling */
+.emojiBox h3 {
+  font-size: 18px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+/* Feedback count text styling */
+.emojiBox p {
+  font-size: 16px;
+  color: #555;
+  margin-top: 5px;
+}
+
+/* Ensure all text wraps properly and doesn't affect box size */
+.emojiBox h3,
+.emojiBox p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Responsive Design: Make boxes stack on smaller screens */
+@media (max-width: 768px) {
+  .topBoxes,
+  .bottomBoxes {
+    flex-direction: column;
+  }
+
+  .emojiBox {
+    width: 90%; /* Adjusted width for smaller screens */
+    height: auto; /* Allow flexibility for smaller screens */
+  }
+}
+
+/* Feedback Table Container */
+.feedbackTableContainer {
+  margin-top: 20px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 95%;
+}
+
+/* Table Styles */
+.feedbackTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Table Header */
+.feedbackTable thead {
+  background: #007bff;
+  color: white;
+  text-align: left;
+}
+
+.feedbackTable th {
+  padding: 12px;
+  font-size: 16px;
+  text-transform: uppercase;
+  border-bottom: 2px solid #004b99;
+}
+
+/* Table Rows */
+.feedbackTable tbody tr {
+  border-bottom: 1px solid #ddd;
+  transition: background 0.3s ease-in-out;
+}
+
+.feedbackTable tbody tr:hover {
+  background: #f1f1f1;
+}
+
+/* Table Data Cells */
+.feedbackTable td {
+  padding: 12px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* No Feedback Message */
+.noFeedback {
+  text-align: center;
+  padding: 15px;
+  font-style: italic;
+  color: #777;
+}
+
+/* Responsive Table */
+@media screen and (max-width: 768px) {
+  .feedbackTable {
+    font-size: 12px;
+  }
+
+  .feedbackTable th,
+  .feedbackTable td {
+    padding: 8px;
+  }
+}
+
+/* Styling for the toggle switch */
+.toggleSwitch {
+  margin-bottom: 20px;
+  margin-left: auto; /* Pushes the switch to the right */
+  display: flex;
+  align-items: center;
+  font-size: 14px; /* Adjusted font size */
+}
+
+.graphicalAnalytics {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #f0f8ff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.graphicalAnalytics canvas {
+  width: 100% !important;
+  height: 300px !important;
+}

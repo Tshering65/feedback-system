@@ -1,0 +1,40 @@
+.dashboardContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.headerBar {
+  background: #fff;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.profileSection {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+.mainContent {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.serviceBoxes {
+  display: flex;
+  justify-content: space-between;
+}
+
+.serviceBox {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
