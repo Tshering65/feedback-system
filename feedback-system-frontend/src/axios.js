@@ -1,8 +1,17 @@
-import axios from 'axios';
+import axios from "axios";
 
-const instance = axios.create({
-  baseURL: 'http://localhost:5000/api', // Admin API base URL
-  withCredentials: true, // This ensures credentials (cookies) are included in requests
+// Get the base URL depending on the environment
+const baseURL =
+  process.env.NODE_ENV === "production"
+    ? "https://nppf-feedback-system.vercel.app/api" // Vercel URL for production
+    : "http://localhost:5000/api"; // Localhost URL for development
+
+const axiosInstance = axios.create({
+  baseURL: baseURL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-export default instance;
+export default axiosInstance;
+

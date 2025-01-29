@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../axios";
+import axiosInstance from "../axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./AdminLogin.css";
 
 const AdminLogin = ({ onLogin = () => {} }) => {
   const [adminData, setAdminData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false); // Add loading state for button
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -15,16 +16,19 @@ const AdminLogin = ({ onLogin = () => {} }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Set loading to true when form is being submitted
+
     try {
-      const response = await axios.post(
-        "https://nppf-feedback-system.vercel.app/api/admin/login",
+      const response = await axiosInstance.post(
+        "/api/admin/login", // Ensure this URL is relative to your backend server
         { email: adminData.email, password: adminData.password },
         { withCredentials: true }  // Ensure cookies/session are properly handled
       );
+
       console.log("Login Response:", response.data); // Debugging
 
       toast.success("Login Successful!");
-      setTimeout(() => navigate("/dashboard"), 1500); // Delay navigation
+      setTimeout(() => navigate("/dashboard"), 1500); // Delay navigation to allow toast to appear
 
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("email", adminData.email);
@@ -35,6 +39,8 @@ const AdminLogin = ({ onLogin = () => {} }) => {
       toast.error(
         "Login Failed: " + (error.response?.data?.message || "Server Error")
       );
+    } finally {
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -43,7 +49,7 @@ const AdminLogin = ({ onLogin = () => {} }) => {
       <ToastContainer /> {/* Ensure this is inside the component */}
       <header className="admin-header">
         <img
-          src="/icons/nppf logo.webp"
+          src="/icons/nppf-logo.webp"
           alt="NPPF Logo"
           className="admin-logo"
         />
@@ -56,6 +62,7 @@ const AdminLogin = ({ onLogin = () => {} }) => {
             name="email"
             placeholder="Email"
             onChange={handleChange}
+            value={adminData.email}
             required
           />
           <input
@@ -63,9 +70,12 @@ const AdminLogin = ({ onLogin = () => {} }) => {
             name="password"
             placeholder="Password"
             onChange={handleChange}
+            value={adminData.password}
             required
           />
-          <button type="submit">Login</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
       </div>
       <footer className="admin-footer">

@@ -13,7 +13,6 @@ import InvestmentPage from "./components/InvestmentPage";
 
 
 const App = () => {
-  const [resetRequired, setResetRequired] = useState(false);
   const [serviceType, setServiceType] = useState(""); 
   const [emojiFeedback, setEmojiFeedback] = useState(""); 
 

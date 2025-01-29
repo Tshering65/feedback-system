@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../axios";
+import axiosInstance from "../axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./AdminRegister.css";
@@ -11,6 +11,7 @@ const AdminRegister = () => {
     password: "",
     profilePicture: null,
   });
+  const [loading, setLoading] = useState(false); // Add loading state
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,8 +22,6 @@ const AdminRegister = () => {
     }
   };
 
-  console.log(adminData); // Log the adminData state to verify
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -30,6 +29,8 @@ const AdminRegister = () => {
       toast.error("Email and password are required.");
       return;
     }
+
+    setLoading(true); // Set loading to true when form is submitted
 
     const formData = new FormData();
     formData.append("email", adminData.email);
@@ -40,15 +41,15 @@ const AdminRegister = () => {
     }
 
     try {
-      const response = await axios.post("/admin/register", formData, {
+      const response = await axiosInstance.post("/admin/register", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
       toast.success("Admin registered successfully"); // Success toast
-      setTimeout(() => navigate("/admin-login"), 1500); // Delay navigation
+      setTimeout(() => navigate("/admin-login"), 1500); // Delay navigation to the login page
 
-      // Clear form data after success
+      // Clear form data after successful registration
       setAdminData({
         email: "",
         password: "",
@@ -56,7 +57,11 @@ const AdminRegister = () => {
       });
     } catch (error) {
       console.error("Registration failed", error);
-      toast.error("Registration failed. Please try again."); // Error toast
+      toast.error(
+        error.response?.data?.message || "Registration failed. Please try again."
+      ); // Error toast with server message
+    } finally {
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -66,7 +71,7 @@ const AdminRegister = () => {
       {/* Header */}
       <header className="admin-header">
         <img
-          src="/icons/nppf logo.webp"
+          src="/icons/nppf-logo.webp"
           alt="NPPF Logo"
           className="admin-logo"
         />
@@ -79,6 +84,7 @@ const AdminRegister = () => {
             type="email"
             name="email"
             placeholder="Email"
+            value={adminData.email}
             onChange={handleChange}
             required
           />
@@ -86,6 +92,7 @@ const AdminRegister = () => {
             type="password"
             name="password"
             placeholder="Password"
+            value={adminData.password}
             onChange={handleChange}
             required
           />
@@ -95,7 +102,9 @@ const AdminRegister = () => {
             onChange={handleChange}
             accept="image/*"
           />
-          <button type="submit">Register</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Registering..." : "Register"}
+          </button>
         </form>
       </div>
       {/* Footer */}

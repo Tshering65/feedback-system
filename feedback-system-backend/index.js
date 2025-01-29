@@ -11,10 +11,14 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://nppf-feedback-system.vercel.app/",
+    origin: [
+      "https://nppf-feedback-system.vercel.app/",
+      "http://localhost:3000", // Adjust based on your local development port
+    ],
     credentials: true,
   })
 );
+
 
 app.use(express.json());
 app.use(bodyParser.json());

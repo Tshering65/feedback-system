@@ -2,16 +2,23 @@ const Admin = require("../models/Admin");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 
-// Set up multer for file upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Save in 'uploads' folder
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
+// Cloudinary configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Set up Cloudinary storage for multer
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "admin-profile-pictures", // Folder in Cloudinary to store the images
+    allowed_formats: ["jpg", "jpeg", "png", "gif"], // Allowed file formats
+    transformation: [{ width: 500, height: 500, crop: "limit" }], // Optional image transformation
   },
 });
 
@@ -35,10 +42,10 @@ exports.register = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Handle file upload
+    // Handle file upload (Cloudinary URL)
     let profilePicture = null;
     if (req.file) {
-      profilePicture = `/uploads/${req.file.filename}`;
+      profilePicture = req.file.path; // Cloudinary returns the URL in req.file.path
     }
 
     // Create new admin
@@ -57,7 +64,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// ✅ Admin Login (Fixed Issues)
+// ✅ Admin Login
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -68,7 +75,7 @@ exports.login = async (req, res) => {
 
     const admin = await Admin.findOne({ email });
     if (!admin) {
-      return res.status(401).json({ message: "Invalid credentials" }); // Return 401 for security
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
@@ -87,7 +94,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// ✅ Get Admin Profile (Fixed URL Parameter)
+// ✅ Get Admin Profile
 exports.getProfile = async (req, res) => {
   try {
     const { email } = req.params;
@@ -109,7 +116,7 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// ✅ Check Old Password (Secure Verification)
+// ✅ Check Old Password
 exports.checkOldPassword = async (req, res) => {
   try {
     const { email, oldPassword } = req.body;
@@ -135,7 +142,7 @@ exports.checkOldPassword = async (req, res) => {
   }
 };
 
-// ✅ Update Admin Profile (Password & Picture)
+// ✅ Update Admin Profile
 exports.updateAdminProfile = async (req, res) => {
   try {
     const { email, oldPassword, newPassword } = req.body;
@@ -161,16 +168,16 @@ exports.updateAdminProfile = async (req, res) => {
       admin.password = hashedNewPassword;
     }
 
-    // Handle profile picture update
+    // Handle profile picture update (Cloudinary URL)
     if (req.file) {
-      // Delete old picture if it exists
+      // Delete old picture from Cloudinary if it exists
       if (admin.profilePicture) {
-        const oldPicturePath = path.join(__dirname, "..", "uploads", path.basename(admin.profilePicture));
-        fs.unlink(oldPicturePath, (err) => {
-          if (err) console.error("Error deleting old profile picture:", err);
+        const publicId = admin.profilePicture.split('/').pop().split('.')[0];
+        cloudinary.uploader.destroy(publicId, (err, result) => {
+          if (err) console.error("Error deleting old profile picture from Cloudinary:", err);
         });
       }
-      admin.profilePicture = `/uploads/${req.file.filename}`;
+      admin.profilePicture = req.file.path; // Cloudinary URL
     }
 
     await admin.save();

@@ -1,30 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../axios";
-import { FaUserCircle } from "react-icons/fa";
+import axiosInstance from "../axiosInstance";
+import { toast } from "react-toastify";
 import ReactSwitch from "react-switch";
+import { FaUserCircle } from "react-icons/fa";
 import { Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import "./AdminDashboard.css";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import { Chart as ChartJS } from "chart.js/auto";
+import "../styles/AdminDashboard.css";
 
 const AdminDashboard = () => {
   const [adminProfile, setAdminProfile] = useState({});
@@ -32,60 +14,63 @@ const AdminDashboard = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [newProfilePicture, setNewProfilePicture] = useState(null);
-  const email = localStorage.getItem("email");
-
   const [servicesFeedback, setServicesFeedback] = useState({
     loan: 0,
     pension: 0,
     pensioners: 0,
     investment: 0,
   });
-
   const [showAnalytics, setShowAnalytics] = useState(false);
   const navigate = useNavigate();
+  const email = localStorage.getItem("email");
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const email = localStorage.getItem("email");
-        const response = await axios.get(`/admin/profile/${email}`);
-        const profilePictureUrl = response.data.profilePicture
-          ? `http://localhost:5000${response.data.profilePicture}`
-          : null;
-        setAdminProfile({
-          ...response.data,
-          profilePicture: profilePictureUrl,
-        });
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
-
-    const fetchServiceFeedback = async () => {
-      try {
-        const response = await axios.get("/admin/feedback-counts");
-        setServicesFeedback(response.data);
-      } catch (error) {
-        console.error("Error fetching feedback counts:", error);
-      }
-    };
-
     fetchProfile();
     fetchServiceFeedback();
   }, []);
 
+  // Fetch the admin profile
+  const fetchProfile = async () => {
+    try {
+      const apiUrl = process.env.NODE_ENV === 'production'
+        ? 'https://nppf-feedback-system.vercel.app' : 'http://localhost:5000';
+      const response = await axiosInstance.get(`${apiUrl}/admin/profile/${email}`);
+      setAdminProfile({
+        ...response.data,
+        profilePicture: `${apiUrl}${response.data.profilePicture}`,
+      });
+    } catch (error) {
+      toast.error("Error fetching profile");
+    }
+  };
+
+  // Fetch feedback counts for different services
+  const fetchServiceFeedback = async () => {
+    try {
+      const apiUrl = process.env.NODE_ENV === 'production'
+        ? 'https://nppf-feedback-system.vercel.app' : 'http://localhost:5000';
+      const response = await axiosInstance.get(`${apiUrl}/admin/feedback-counts`);
+      setServicesFeedback(response.data);
+    } catch (error) {
+      toast.error("Error fetching feedback counts");
+    }
+  };
+
+  // Handle logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
     navigate("/admin-login");
   };
 
+  // Verify the old password
   const verifyOldPassword = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/admin/check-old-password",
+      const response = await axiosInstance.post(
+        "/api/admin/check-old-password",
         { email, oldPassword }
       );
       if (response.status === 200) {
@@ -93,45 +78,45 @@ const AdminDashboard = () => {
         toast.success("Old password verified!");
       }
     } catch (error) {
-      setIsPasswordCorrect(false);
       toast.error("Incorrect old password");
+      setIsPasswordCorrect(false);
     }
   };
 
+  // Update admin profile
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    if (newPassword !== confirmNewPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
     const formData = new FormData();
     formData.append("email", email);
     formData.append("oldPassword", oldPassword);
-
     if (newProfilePicture) formData.append("profilePicture", newProfilePicture);
     if (newPassword.trim() !== "") formData.append("newPassword", newPassword);
 
     try {
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         "/admin/update-admin-profile",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-
-      toast.success(response.data.message);
+      toast.success("Profile updated successfully!");
       setAdminProfile((prev) => ({
         ...prev,
         profilePicture: response.data.profilePicture,
       }));
       setIsUpdating(false);
-      setShowProfile(false); // Hide dropdown when update form is submitted
+      setShowProfile(false);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Update failed");
+      toast.error("Update failed");
     }
   };
 
-  const handleToggleChange = (checked) => {
-    setShowAnalytics(checked);
-  };
-
+  // Chart data for feedback count
   const barChartData = {
     labels: ["Loan", "Pension", "Pensioners", "Investment"],
     datasets: [
@@ -149,6 +134,9 @@ const AdminDashboard = () => {
       },
     ],
   };
+
+  // Toggle analytics display
+  const handleToggleChange = () => setShowAnalytics(!showAnalytics);
 
   return (
     <div className="dashboardContainer">
@@ -225,7 +213,6 @@ const AdminDashboard = () => {
       </div>
       <div className="mainContent">
         <h2>Total Feedback For Each Service</h2>
-
         <div className="toggleSwitch">
           <span>Show Graphical Analytics: </span>
           <ReactSwitch
@@ -246,7 +233,11 @@ const AdminDashboard = () => {
         ) : (
           <div className="serviceBoxes">
             <div className="serviceBox">
-              <img src="/icons/lOan.png" alt="Loan" className="serviceImage" />
+              <img
+                src="/icons/lOan.png"
+                alt="Loan"
+                className="serviceImage"
+              />
               <h3>Loan</h3>
               <p>Feedback Count: {servicesFeedback.loan}</p>
             </div>
@@ -279,7 +270,6 @@ const AdminDashboard = () => {
             </div>
           </div>
         )}
-
         {isUpdating && (
           <div className="modal-overlay">
             <div className="updateForm">
@@ -293,7 +283,6 @@ const AdminDashboard = () => {
                   onBlur={verifyOldPassword}
                   required
                 />
-
                 <label>New Password:</label>
                 <input
                   type="password"
@@ -301,34 +290,35 @@ const AdminDashboard = () => {
                   onChange={(e) => setNewPassword(e.target.value)}
                   disabled={!isPasswordCorrect}
                 />
-
-                <label>Profile Picture:</label>
+                <label>Confirm New Password:</label>
+                <input
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  disabled={!isPasswordCorrect}
+                />
+                <label>Change Profile Picture (Optional):</label>
                 <input
                   type="file"
-                  accept="image/*"
                   onChange={(e) => setNewProfilePicture(e.target.files[0])}
                   disabled={!isPasswordCorrect}
                 />
-
-                <button
-                  type="submit"
-                  disabled={!isPasswordCorrect}
-                  className="submitButton"
-                >
-                  Update
-                </button>
+                <div className="buttons">
+                  <button type="submit" disabled={!isPasswordCorrect}>
+                    Update Profile
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsUpdating(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </form>
-              <button
-                className="closeButton"
-                onClick={() => setIsUpdating(false)}
-              >
-                X
-              </button>
             </div>
           </div>
         )}
       </div>
-      <ToastContainer /> {/* Toastify container */}
     </div>
   );
 };
