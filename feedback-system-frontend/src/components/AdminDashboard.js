@@ -6,7 +6,7 @@ import ReactSwitch from "react-switch";
 import { FaUserCircle } from "react-icons/fa";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS } from "chart.js/auto";
-import "../styles/AdminDashboard.css";
+import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
   const [adminProfile, setAdminProfile] = useState({});
