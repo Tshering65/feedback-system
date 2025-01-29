@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../axiosInstance";
+import axiosInstance from "../axios";
 import { toast } from "react-toastify";
 import ReactSwitch from "react-switch";
 import { FaUserCircle } from "react-icons/fa";
