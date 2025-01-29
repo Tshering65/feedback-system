@@ -1,4 +1,4 @@
-const Admin = require("../models/Admin"); // Assuming you have an Admin model
+const Admin = require("../models/Admin");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
@@ -11,21 +11,19 @@ const storage = multer.diskStorage({
     cb(null, "uploads/"); // Save in 'uploads' folder
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Save with unique filename
+    cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
   },
 });
 
 const upload = multer({ storage: storage });
 
+// ✅ Admin Registration
 exports.register = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate the input
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
     // Check if admin already exists
@@ -47,52 +45,57 @@ exports.register = async (req, res) => {
     const newAdmin = new Admin({
       email,
       password: hashedPassword,
-      profilePicture, // Save image path or null if no file uploaded
+      profilePicture,
     });
 
-    // Save the new admin to the database
     await newAdmin.save();
 
-    // Send success response
     res.status(201).json({ message: "Admin registered successfully" });
   } catch (error) {
-    console.error("Registration error:", error); // Log error details for debugging
+    console.error("Registration error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Admin login
+// ✅ Admin Login (Fixed Issues)
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find admin by email
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
     const admin = await Admin.findOne({ email });
     if (!admin) {
-      return res.status(400).json({ message: "Admin not found" });
+      return res.status(401).json({ message: "Invalid credentials" }); // Return 401 for security
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Create JWT token
-    const token = jwt.sign({ email: admin.email }, process.env.SECRET_KEY, {
+    const token = jwt.sign({ id: admin._id }, process.env.SECRET_KEY, {
       expiresIn: "1h",
     });
 
-    res.json({ token, admin });
+    res.json({ message: "Login successful", token, admin });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Get admin profile
+// ✅ Get Admin Profile (Fixed URL Parameter)
 exports.getProfile = async (req, res) => {
   try {
-    const email = req.params.email;
+    const { email } = req.params;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email parameter is required" });
+    }
+
     const admin = await Admin.findOne({ email });
 
     if (!admin) {
@@ -101,15 +104,19 @@ exports.getProfile = async (req, res) => {
 
     res.json(admin);
   } catch (error) {
+    console.error("Get profile error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Update Admin Profile (Password & Profile Picture)
+// ✅ Check Old Password (Secure Verification)
 exports.checkOldPassword = async (req, res) => {
-  console.log("Checking password"); // Add a log to verify if the route is hit.
   try {
     const { email, oldPassword } = req.body;
+
+    if (!email || !oldPassword) {
+      return res.status(400).json({ message: "Email and old password are required" });
+    }
 
     const admin = await Admin.findOne({ email });
     if (!admin) {
@@ -128,16 +135,21 @@ exports.checkOldPassword = async (req, res) => {
   }
 };
 
-// Update admin profile
+// ✅ Update Admin Profile (Password & Picture)
 exports.updateAdminProfile = async (req, res) => {
   try {
     const { email, oldPassword, newPassword } = req.body;
-    const admin = await Admin.findOne({ email });
+    
+    if (!email || !oldPassword) {
+      return res.status(400).json({ message: "Email and old password are required" });
+    }
 
+    const admin = await Admin.findOne({ email });
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
     }
 
+    // Check old password before updating
     const isMatch = await bcrypt.compare(oldPassword, admin.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Incorrect old password" });
@@ -151,13 +163,9 @@ exports.updateAdminProfile = async (req, res) => {
 
     // Handle profile picture update
     if (req.file) {
+      // Delete old picture if it exists
       if (admin.profilePicture) {
-        const oldPicturePath = path.join(
-          __dirname,
-          "..",
-          "uploads",
-          admin.profilePicture.split("/").pop()
-        );
+        const oldPicturePath = path.join(__dirname, "..", "uploads", path.basename(admin.profilePicture));
         fs.unlink(oldPicturePath, (err) => {
           if (err) console.error("Error deleting old profile picture:", err);
         });
@@ -177,5 +185,5 @@ exports.updateAdminProfile = async (req, res) => {
   }
 };
 
-// Profile picture update (use this for the file upload only)
+// ✅ Upload Profile Picture
 exports.uploadProfilePicture = upload.single("profilePicture");

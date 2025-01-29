@@ -2,24 +2,25 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const multer = require("multer");
 const path = require("path");
 const adminRoutes = require("./routes/adminRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-app.use(cors({
-  origin: 'https://nppf-feedback-system.vercel.app/',
-  credentials: true
-}));
-
+app.use(
+  cors({
+    origin: "https://nppf-feedback-system.vercel.app/",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(bodyParser.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// ❌ Remove local uploads folder (Vercel doesn't support file storage)
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB Connection
 const mongoURI = process.env.MONGO_URI;
@@ -32,12 +33,12 @@ mongoose
   .connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 30000, // Increase timeout for MongoDB connection
+    serverSelectionTimeoutMS: 30000,
   })
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => {
     console.error("❌ Error connecting to MongoDB:", err.message);
-    process.exit(1); // Exit process on connection failure
+    process.exit(1);
   });
 
 // API Routes
@@ -49,7 +50,5 @@ app.get("/", (req, res) => {
   res.send("Feedback System Backend is Running 🚀");
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+// ✅ Export Express app for Vercel
+module.exports = app;
