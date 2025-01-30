@@ -16,6 +16,8 @@ app.use(
     origin: "https://feedback-system-frontend.vercel.app", // Specify your frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Ensure all headers are allowed
+
   })
 );
 
