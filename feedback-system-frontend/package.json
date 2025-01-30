@@ -5,12 +5,15 @@
   "dependencies": {
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
+    "cloudinary": "^2.5.1",
     "cra-template": "1.2.0",
     "excel": "^1.0.1",
     "file-saver": "^2.0.5",
     "formik": "^2.4.6",
     "js": "^0.1.0",
     "multer": "^1.4.5-lts.1",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
@@ -25,9 +28,9 @@
     "yup": "^1.6.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -49,6 +52,7 @@
     ]
   },
   "devDependencies": {
-    "@types/json2csv": "^5.0.7"
+    "@types/json2csv": "^5.0.7",
+    "react-app-rewired": "^2.2.1"
   }
 }

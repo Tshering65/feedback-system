@@ -42,7 +42,7 @@ const InvestmentPage = () => {
         const email = localStorage.getItem("email");
         const response = await axios.get(`/admin/profile/${email}`);
         const profilePictureUrl = response.data.profilePicture
-          ? `https://feedback-system-eight.vercel.app${response.data.profilePicture}`
+          ? `http://localhost:5000${response.data.profilePicture}`
           : null;
         setAdminProfile({
           ...response.data,
@@ -66,7 +66,7 @@ const InvestmentPage = () => {
   const verifyOldPassword = async () => {
     try {
       const response = await axios.post(
-        "https://feedback-system-eight.vercel.app/api/admin/check-old-password",
+        "http://localhost:5000/api/admin/check-old-password",
         { email, oldPassword }
       );
       if (response.status === 200) {
@@ -81,13 +81,39 @@ const InvestmentPage = () => {
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    
     const formData = new FormData();
     formData.append("email", email);
     formData.append("oldPassword", oldPassword);
-
-    if (newProfilePicture) formData.append("profilePicture", newProfilePicture);
-    if (newPassword.trim() !== "") formData.append("newPassword", newPassword);
-
+  
+    // Upload profile picture to Cloudinary
+    if (newProfilePicture) {
+      try {
+        const imageData = new FormData();
+        imageData.append("profilePicture", newProfilePicture);
+  
+        const imageUploadResponse = await axios.post(
+          "http://localhost:5000/admin/upload-profile-picture", // Backend route for image upload
+          imageData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+  
+        const profilePictureUrl = imageUploadResponse.data.url; // Get the URL from Cloudinary
+  
+        formData.append("profilePicture", profilePictureUrl);
+      } catch (error) {
+        toast.error("Failed to upload profile picture");
+        return;
+      }
+    }
+  
+    // Upload updated profile info (email, password, and profile picture)
+    if (newPassword.trim() !== "") {
+      formData.append("newPassword", newPassword);
+    }
+  
     try {
       const response = await axios.put(
         "/admin/update-admin-profile",
@@ -96,7 +122,7 @@ const InvestmentPage = () => {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-
+  
       toast.success(response.data.message);
       setAdminProfile((prev) => ({
         ...prev,
@@ -108,6 +134,7 @@ const InvestmentPage = () => {
       toast.error(error.response?.data?.message || "Update failed");
     }
   };
+  
 
   const fetchFeedbackDetails = async (emojiType) => {
     try {
