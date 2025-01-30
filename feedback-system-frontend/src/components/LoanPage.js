@@ -42,7 +42,7 @@ const LoanPage = () => {
         const email = localStorage.getItem("email");
         const response = await axios.get(`/admin/profile/${email}`);
         const profilePictureUrl = response.data.profilePicture
-          ? `http://localhost:5000${response.data.profilePicture}`
+          ? `https://feedback-system-eight.vercel.app${response.data.profilePicture}`
           : null;
         setAdminProfile({
           ...response.data,
@@ -65,7 +65,7 @@ const LoanPage = () => {
 
   const verifyOldPassword = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/admin/check-old-password", { email, oldPassword });
+      const response = await axios.post("https://feedback-system-eight.vercel.app/api/admin/check-old-password", { email, oldPassword });
       if (response.status === 200) {
         setIsPasswordCorrect(true);
         toast.success("Old password verified!");
