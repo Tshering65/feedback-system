@@ -8,16 +8,13 @@ const feedbackRoutes = require("./routes/feedbackRoutes");
 require("dotenv").config();
 
 const app = express();
+const corsOptions = {
+  origin: ["https://nppf-feedback-system-git-main-developers-projects-b07dc10f.vercel.app"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // Allow cookies & auth headers
+};
 
-app.use(
-  cors({
-    origin: [
-      "https://nppf-feedback-system.vercel.app/",
-      "http://localhost:3000", // Adjust based on your local development port
-    ],
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 
 
 app.use(express.json());
