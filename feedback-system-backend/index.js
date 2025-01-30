@@ -11,14 +11,27 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS Middleware (before all routes)
+// ✅ Explicit CORS Headers (Handles Preflight Requests Properly)
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://feedback-system-frontend.vercel.app");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204); // No Content for Preflight Requests
+  }
+  next();
+});
+
+// ✅ CORS Middleware (Secondary)
 app.use(cors({
   origin: "https://feedback-system-frontend.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
-// ✅ Body Parser (before routes)
+// ✅ Body Parser
 app.use(bodyParser.json());
 app.use(express.json());
 
@@ -36,7 +49,7 @@ mongoose
   .connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 30000, // Increase timeout to avoid connection failure
+    serverSelectionTimeoutMS: 30000,
   })
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => {
