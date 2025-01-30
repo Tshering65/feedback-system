@@ -1,31 +1,16 @@
 const Admin = require("../models/Admin"); // Assuming you have an Admin model
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("../config/cloudinaryConfig"); // Import Cloudinary config
 
-// Set up multer for file upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Save in 'uploads' folder
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Save with unique filename
-  },
-});
-
-const upload = multer({ storage: storage });
-
+// Admin registration
 exports.register = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     // Validate the input
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
     // Check if admin already exists
@@ -37,17 +22,26 @@ exports.register = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Handle file upload
+    // Handle file upload to Cloudinary
     let profilePicture = null;
     if (req.file) {
-      profilePicture = `/uploads/${req.file.filename}`;
+      const result = await cloudinary.uploader.upload_stream(
+        { resource_type: "auto" }, // Automatically detect the file type (image, video, etc.)
+        (error, result) => {
+          if (error) {
+            return res.status(500).json({ message: "Cloudinary upload error", error });
+          }
+          profilePicture = result.secure_url; // Cloudinary URL for the uploaded image
+        }
+      );
+      req.pipe(result); // Pipe the file to Cloudinary's upload stream
     }
 
     // Create new admin
     const newAdmin = new Admin({
       email,
       password: hashedPassword,
-      profilePicture, // Save image path or null if no file uploaded
+      profilePicture, // Save the Cloudinary URL
     });
 
     // Save the new admin to the database
@@ -56,11 +50,10 @@ exports.register = async (req, res) => {
     // Send success response
     res.status(201).json({ message: "Admin registered successfully" });
   } catch (error) {
-    console.error("Registration error:", error); // Log error details for debugging
+    console.error("Registration error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 // Admin login
 exports.login = async (req, res) => {
   try {
@@ -128,7 +121,7 @@ exports.checkOldPassword = async (req, res) => {
   }
 };
 
-// Update admin profile
+// Update Admin Profile (with Cloudinary upload)
 exports.updateAdminProfile = async (req, res) => {
   try {
     const { email, oldPassword, newPassword } = req.body;
@@ -149,24 +142,28 @@ exports.updateAdminProfile = async (req, res) => {
       admin.password = hashedNewPassword;
     }
 
-    // Handle profile picture update
+    // Handle profile picture update to Cloudinary
     if (req.file) {
+      // Delete the old profile picture if it exists
       if (admin.profilePicture) {
-        const oldPicturePath = path.join(
-          __dirname,
-          "..",
-          "uploads",
-          admin.profilePicture.split("/").pop()
-        );
-        fs.unlink(oldPicturePath, (err) => {
-          if (err) console.error("Error deleting old profile picture:", err);
-        });
+        const oldPublicId = admin.profilePicture.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(oldPublicId); // Remove old image from Cloudinary
       }
-      admin.profilePicture = `/uploads/${req.file.filename}`;
+
+      // Upload new profile picture to Cloudinary
+      const result = await cloudinary.uploader.upload_stream(
+        { resource_type: "auto" },
+        (error, result) => {
+          if (error) {
+            return res.status(500).json({ message: "Cloudinary upload error", error });
+          }
+          admin.profilePicture = result.secure_url; // Save the new Cloudinary URL
+        }
+      );
+      req.pipe(result); // Pipe the new file to Cloudinary's upload stream
     }
 
     await admin.save();
-
     res.json({
       message: "Profile updated successfully",
       profilePicture: admin.profilePicture,
