@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors(
   {
-  origin: ["https://feedback-system-eight.vercel.app/"],
+  origin: ["https://feedback-system-frontend.vercel.app"],
   Methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true 
 }
