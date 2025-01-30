@@ -11,7 +11,6 @@ import PensionPage from "./components/PensionPage";
 import PensionersPage from "./components/PensionersPage";
 import InvestmentPage from "./components/InvestmentPage";
 
-
 const App = () => {
   const [resetRequired, setResetRequired] = useState(false);
   const [serviceType, setServiceType] = useState(""); 

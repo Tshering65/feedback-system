@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import axiosInstance from "../axios";
+import axios from "../axiosConfig";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import "./FeedbackForm.css"; // Correct import path for the updated CSS
 
@@ -39,7 +39,7 @@ const UniqueFeedbackForm = ({ service_type, emoji_feedback }) => {
     }
 
     try {
-      await axiosInstance.post("/feedback", {
+      await axios.post("/feedback", {
         service_type,
         emoji_feedback,
         text_feedback,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../axios";
+import axios from "../axios";
 import { FaUserCircle } from "react-icons/fa";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -30,7 +30,7 @@ const LoanPage = () => {
   useEffect(() => {
     const fetchFeedbackCounts = async () => {
       try {
-        const response = await axiosInstance.get(`/feedback/loan/emoji-counts`);
+        const response = await axios.get(`/feedback/loan/emoji-counts`);
         setEmojiFeedbackCounts(response.data);
       } catch (error) {
         console.error("Error fetching loan feedback counts:", error);
@@ -40,7 +40,7 @@ const LoanPage = () => {
     const fetchProfile = async () => {
       try {
         const email = localStorage.getItem("email");
-        const response = await axiosInstance.get(`/admin/profile/${email}`);
+        const response = await axios.get(`/admin/profile/${email}`);
         const profilePictureUrl = response.data.profilePicture
           ? `http://localhost:5000${response.data.profilePicture}`
           : null;
@@ -65,7 +65,7 @@ const LoanPage = () => {
 
   const verifyOldPassword = async () => {
     try {
-      const response = await axiosInstance.post("http://localhost:5000/api/admin/check-old-password", { email, oldPassword });
+      const response = await axios.post("http://localhost:5000/api/admin/check-old-password", { email, oldPassword });
       if (response.status === 200) {
         setIsPasswordCorrect(true);
         toast.success("Old password verified!");
@@ -86,7 +86,7 @@ const LoanPage = () => {
     if (newPassword.trim() !== "") formData.append("newPassword", newPassword);
 
     try {
-      const response = await axiosInstance.put("/admin/update-admin-profile", formData, {
+      const response = await axios.put("/admin/update-admin-profile", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -102,7 +102,7 @@ const LoanPage = () => {
 
   const fetchFeedbackDetails = async (emojiType) => {
     try {
-      const response = await axiosInstance.get(
+      const response = await axios.get(
         `/feedback/loan/feedback-details/${emojiType}`
       );
       setFeedbackDetails(response.data);
@@ -116,7 +116,7 @@ const LoanPage = () => {
 
   const exportData = async (service, format) => {
     try {
-      const response = await axiosInstance.get(
+      const response = await axios.get(
         `/feedback/${service}/export-${format}`,
         { responseType: "blob" }
       );

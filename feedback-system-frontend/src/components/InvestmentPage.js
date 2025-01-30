@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../axios";
+import axios from "../axios";
 import { FaUserCircle } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -30,7 +30,7 @@ const InvestmentPage = () => {
     const fetchFeedbackCounts = async () => {
       try {
         // Adjust URL to match the backend route
-        const response = await axiosInstance.get(`/feedback/investment/emoji-counts`); // <-- Ensure this matches the backend route
+        const response = await axios.get(`/feedback/investment/emoji-counts`); // <-- Ensure this matches the backend route
         setEmojiFeedbackCounts(response.data); // Set feedback counts for Loan service
       } catch (error) {
         console.error("Error fetching investment feedback counts:", error);
@@ -40,7 +40,7 @@ const InvestmentPage = () => {
     const fetchProfile = async () => {
       try {
         const email = localStorage.getItem("email");
-        const response = await axiosInstance.get(`/admin/profile/${email}`);
+        const response = await axios.get(`/admin/profile/${email}`);
         const profilePictureUrl = response.data.profilePicture
           ? `http://localhost:5000${response.data.profilePicture}`
           : null;
@@ -65,7 +65,7 @@ const InvestmentPage = () => {
 
   const verifyOldPassword = async () => {
     try {
-      const response = await axiosInstance.post(
+      const response = await axios.post(
         "http://localhost:5000/api/admin/check-old-password",
         { email, oldPassword }
       );
@@ -89,7 +89,7 @@ const InvestmentPage = () => {
     if (newPassword.trim() !== "") formData.append("newPassword", newPassword);
 
     try {
-      const response = await axiosInstance.put(
+      const response = await axios.put(
         "/admin/update-admin-profile",
         formData,
         {
@@ -111,7 +111,7 @@ const InvestmentPage = () => {
 
   const fetchFeedbackDetails = async (emojiType) => {
     try {
-      const response = await axiosInstance.get(
+      const response = await axios.get(
         `/feedback/investment/feedback-details/${emojiType}`
       );
       setFeedbackDetails(response.data);
@@ -123,7 +123,7 @@ const InvestmentPage = () => {
 
   const exportData = async (service, format) => {
     try {
-      const response = await axiosInstance.get(
+      const response = await axios.get(
         `/feedback/${service}/export-${format}`,
         { responseType: "blob" }
       );

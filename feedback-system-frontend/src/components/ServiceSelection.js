@@ -49,7 +49,7 @@ const ServiceSelection = ({ setServiceType }) => {
           onClick={() => handleServiceClick("loan")}
           role="button"
         >
-          <img src="/icons/LOan.png" alt="Loan" />
+          <img src="/icons/lOan.png" alt="Loan" />
           <span>Loan</span>
         </div>
         <div
