@@ -11,19 +11,22 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors(
-  {
-  origin: ["https://feedback-system-frontend.vercel.app"],
-  Methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true 
-}
-));
+// ✅ CORS Middleware (before all routes)
+app.use(cors({
+  origin: "https://feedback-system-frontend.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
+// ✅ Body Parser (before routes)
+app.use(bodyParser.json());
 app.use(express.json());
+
+// ✅ Serve Static Uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// MongoDB Connection
+// ✅ MongoDB Connection
 const mongoURI = process.env.MONGO_URI;
-
 if (!mongoURI) {
   console.error("❌ MONGO_URI is not defined in .env file.");
   process.exit(1);
@@ -33,23 +36,24 @@ mongoose
   .connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 30000, // Increase to 30 seconds
+    serverSelectionTimeoutMS: 30000, // Increase timeout to avoid connection failure
   })
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => {
-    console.error("❌ Error connecting to MongoDB:", err.message);
-    process.exit(1); // Exit process on connection failure
+    console.error("❌ MongoDB Connection Error:", err.message);
+    process.exit(1);
   });
 
+// ✅ Routes
 app.use("/api/feedback", feedbackRoutes);
-app.use(bodyParser.json());
 app.use("/api/admin", adminRoutes);
 
-// Root Route
+// ✅ Root Route
 app.get("/", (req, res) => {
   res.send("Feedback System Backend is Running 🚀");
 });
 
+// ✅ Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
