@@ -20,7 +20,7 @@ const AdminLogin = ({ onLogin = () => {} }) => {
 
     try {
       const response = await axiosInstance.post(
-        "/api/admin/login", // Ensure this URL is relative to your backend server
+        "/admin/login", // Ensure this URL is relative to your backend server
         { email: adminData.email, password: adminData.password },
         { withCredentials: true }  // Ensure cookies/session are properly handled
       );
