@@ -13,36 +13,53 @@ const EmojiSelection = ({ setEmojiFeedback }) => {
 
   return (
     <div className="feedback">
+      {" "}
+      {/* Updated class name to match CSS */}
       {/* Header Section */}
       <header>
         <img
-          src="/icons/nppf-logo.webp" // Ensure the correct file placement
+          src="/icons/nppf logo.webp" // Correct path for Create React App
           alt="NPPF Logo"
           className="logo"
         />
         <h1>Welcome to NPPF Service Feedback System</h1>
       </header>
-
       {/* Emoji Selection Section */}
       <p>What is Your Reaction?</p>
       <div className="emoji-section">
         <div className="emoji-icons">
-          {[
-            { label: "Happy", icon: "😊", value: "happy" },
-            { label: "Satisfactory", icon: "🙂", value: "satisfactory" },
-            { label: "Unsatisfactory", icon: "😡", value: "unsatisfactory" },
-            { label: "Bad", icon: "😞", value: "bad" },
-          ].map(({ label, icon, value }) => (
-            <div key={value} className="emoji-icon" onClick={() => handleEmojiClick(value)}>
-              <span role="img" aria-label={label} className="emoji">
-                {icon}
-              </span>
-              <span className="emoji-text">{label}</span>
-            </div>
-          ))}
+          <div className="emoji-icon" onClick={() => handleEmojiClick("happy")}>
+            <span role="img" aria-label="happy" className="emoji">
+              😊
+            </span>
+            <span className="emoji-text">Happy</span>
+          </div>
+          <div
+            className="emoji-icon"
+            onClick={() => handleEmojiClick("satisfactory")}
+          >
+            <span role="img" aria-label="satisfactory" className="emoji">
+              🙂
+            </span>
+            <span className="emoji-text">Satisfactory</span>
+          </div>
+          <div
+            className="emoji-icon"
+            onClick={() => handleEmojiClick("unsatisfactory")}
+          >
+            <span role="img" aria-label="unsatisfactory" className="emoji">
+              😡
+            </span>
+            <span className="emoji-text">Unsatisfactory</span>
+          </div>
+          <div className="emoji-icon" onClick={() => handleEmojiClick("bad")}>
+            <span role="img" aria-label="bad" className="emoji">
+              😞
+            </span>
+            <span className="emoji-text">Bad</span>
+          </div>
         </div>
       </div>
-
       {/* Footer Section */}
       <footer className="emoji-footer">
         <p>Get In Touch</p>

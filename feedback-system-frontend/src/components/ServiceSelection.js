@@ -6,12 +6,12 @@ const ServiceSelection = ({ setServiceType }) => {
   const navigate = useNavigate();
 
   const handleServiceClick = (service) => {
-    setServiceType(service);
-    navigate("/emoji");
+    setServiceType(service); // Update the selected service type
+    navigate("/emoji"); // Navigate to the next page
   };
 
   const handleAdminLoginClick = () => {
-    navigate("/admin-login");
+    navigate("/admin-login"); // Navigate to Admin Login page
   };
 
   return (
@@ -19,18 +19,16 @@ const ServiceSelection = ({ setServiceType }) => {
       {/* Header */}
       <header className="service-header">
         <img
-          src="/icons/nppf-logo.webp"
+          src="/icons/nppf logo.webp" // Correct path for Create React App
           alt="NPPF Logo"
           className="service-logo"
         />
         <h1 className="service-title">
           Welcome to NPPF Service Feedback System
         </h1>
-        <button
-          className="admin-login-button"
-          onClick={handleAdminLoginClick}
-          aria-label="Admin Login"
-        >
+
+        {/* Admin Login Button */}
+        <button className="admin-login-button" onClick={handleAdminLoginClick}>
           Admin Login
         </button>
       </header>
@@ -38,23 +36,38 @@ const ServiceSelection = ({ setServiceType }) => {
       {/* Services Section */}
       <p className="service-description">Select a Service</p>
       <div className="service-icons">
-        {[
-          { id: "pension", label: "Pension", img: "pension-pf.png" },
-          { id: "loan", label: "Loan", img: "loan.png" },
-          { id: "pensioners", label: "Pensioners", img: "pensioners.png" },
-          { id: "investment", label: "Investment", img: "investment-portfolio.png" },
-        ].map((service) => (
-          <div
-            key={service.id}
-            className="service-icon"
-            onClick={() => handleServiceClick(service.id)}
-            role="button"
-            aria-label={`Select ${service.label} service`}
-          >
-            <img src={`/icons/${service.img}`} alt={service.label} />
-            <span>{service.label}</span>
-          </div>
-        ))}
+        <div
+          className="service-icon"
+          onClick={() => handleServiceClick("pension")}
+          role="button"
+        >
+          <img src="/icons/pension and PF.png" alt="Pension" />
+          <span>Pension</span>
+        </div>
+        <div
+          className="service-icon"
+          onClick={() => handleServiceClick("loan")}
+          role="button"
+        >
+          <img src="/icons/LOan.png" alt="Loan" />
+          <span>Loan</span>
+        </div>
+        <div
+          className="service-icon"
+          onClick={() => handleServiceClick("pensioners")}
+          role="button"
+        >
+          <img src="/icons/Pensioners.png" alt="Pensioners" />
+          <span>Pensioners</span>
+        </div>
+        <div
+          className="service-icon"
+          onClick={() => handleServiceClick("investment")}
+          role="button"
+        >
+          <img src="/icons/investment porfoli.png" alt="Investment" />
+          <span>Investment</span>
+        </div>
       </div>
 
       {/* Footer */}
