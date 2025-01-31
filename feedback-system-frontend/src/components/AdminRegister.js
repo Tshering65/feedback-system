@@ -25,58 +25,40 @@ const AdminRegister = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!adminData.email || !adminData.password) {
       toast.error("Email and password are required.");
       return;
     }
-  
-    if (!adminData.email.endsWith("@nppf.org")) {
-      toast.error("Please use an official nppf.org email.");
-      return;
-    }
-  
-    let imageUrl = "";
-  
-    // Upload image if it exists
-    if (adminData.profilePicture) {
-      try {
-        const formData = new FormData();
-        formData.append("file", adminData.profilePicture);
-        formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET);
-  
-        const cloudinaryResponse = await axios.post(
-          `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
-          formData
-        );
-        imageUrl = cloudinaryResponse.data.secure_url; // Ensure correct Cloudinary URL
-      } catch (error) {
-        console.error("Cloudinary upload failed", error);
-        toast.error("Image upload failed. Please try again.");
-        return;
-      }
-    }
-  
-    try {
-      // Ensure you're passing the image URL here
-      const response = await axios.post("/admin/register", {
-        email: adminData.email,
-        password: adminData.password,
-        profilePicture: imageUrl,  // Passing image URL (or null if no image)
-      });
-      console.log("Registration Response:", response.data.profilePicture);
 
-  
-      toast.success("Admin registered successfully");
-      setTimeout(() => navigate("/admin-login"), 1500);
-  
-      setAdminData({ email: "", password: "", profilePicture: null });
+    const formData = new FormData();
+    formData.append("email", adminData.email);
+    formData.append("password", adminData.password);
+
+    if (adminData.profilePicture) {
+      formData.append("profilePicture", adminData.profilePicture);
+    }
+
+    try {
+      const response = await axios.post("/admin/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      toast.success("Admin registered successfully"); // Success toast
+      setTimeout(() => navigate("/admin-login"), 1500); // Delay navigation
+
+      // Clear form data after success
+      setAdminData({
+        email: "",
+        password: "",
+        profilePicture: null,
+      });
     } catch (error) {
       console.error("Registration failed", error);
-      toast.error("Registration failed. Please try again.");
+      toast.error("Registration failed. Please try again."); // Error toast
     }
   };
-  
 
   return (
     <div className="admin-register">

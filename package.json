@@ -1,0 +1,19 @@
+{
+  "name": "feedback---copy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tshering65/feedback-system.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tshering65/feedback-system/issues"
+  },
+  "homepage": "https://github.com/Tshering65/feedback-system#readme"
+}

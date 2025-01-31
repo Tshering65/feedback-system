@@ -1,80 +1,84 @@
-const Admin = require("../models/Admin");
+const Admin = require("../models/Admin"); // Assuming you have an Admin model
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
-// Remove the redundant cloudinary import
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-// Import cloudinary and uploadPreset from your custom config
-const { cloudinary, uploadPreset } = require("../cloudinaryConfig");
-require("dotenv").config();
+const path = require("path");
+const fs = require("fs");
 
-
-
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "admin_profiles", // Folder name in Cloudinary
-    format: async (req, file) => "png", // Convert all uploads to PNG
-    public_id: (req, file) => Date.now() + "-" + file.originalname,
-    upload_preset: uploadPreset, // Add the upload preset here
+// Set up multer for file upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); // Save in 'uploads' folder
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Save with unique filename
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
-// Admin Registration
 exports.register = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Validate the input
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
+    // Check if admin already exists
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
       return res.status(400).json({ message: "Admin already exists" });
     }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Handle profile picture
+    // Handle file upload
     let profilePicture = null;
     if (req.file) {
-      profilePicture = req.file.path; // This will be the Cloudinary URL
-      console.log("Profile picture URL:", profilePicture);
+      profilePicture = `/uploads/${req.file.filename}`;
     }
-    
+
+    // Create new admin
     const newAdmin = new Admin({
       email,
       password: hashedPassword,
-      profilePicture, // Store the Cloudinary URL
+      profilePicture, // Save image path or null if no file uploaded
     });
 
+    // Save the new admin to the database
     await newAdmin.save();
 
+    // Send success response
     res.status(201).json({ message: "Admin registered successfully" });
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error("Registration error:", error); // Log error details for debugging
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Admin Login
+// Admin login
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Find admin by email
     const admin = await Admin.findOne({ email });
     if (!admin) {
       return res.status(400).json({ message: "Admin not found" });
     }
 
+    // Compare password
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Create JWT token
     const token = jwt.sign({ email: admin.email }, process.env.SECRET_KEY, {
       expiresIn: "1h",
     });
@@ -85,7 +89,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// Get Admin Profile
+// Get admin profile
 exports.getProfile = async (req, res) => {
   try {
     const email = req.params.email;
@@ -124,7 +128,7 @@ exports.checkOldPassword = async (req, res) => {
   }
 };
 
-// Update Admin Profile (Password & Profile Picture)
+// Update admin profile
 exports.updateAdminProfile = async (req, res) => {
   try {
     const { email, oldPassword, newPassword } = req.body;
@@ -139,6 +143,7 @@ exports.updateAdminProfile = async (req, res) => {
       return res.status(400).json({ message: "Incorrect old password" });
     }
 
+    // Update password if provided
     if (newPassword && newPassword.trim() !== "") {
       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
       admin.password = hashedNewPassword;
@@ -147,12 +152,17 @@ exports.updateAdminProfile = async (req, res) => {
     // Handle profile picture update
     if (req.file) {
       if (admin.profilePicture) {
-        const publicId = admin.profilePicture.split("/").pop().split(".")[0];
-        cloudinary.uploader.destroy(`admin_profiles/${publicId}`, (err, result) => {
+        const oldPicturePath = path.join(
+          __dirname,
+          "..",
+          "uploads",
+          admin.profilePicture.split("/").pop()
+        );
+        fs.unlink(oldPicturePath, (err) => {
           if (err) console.error("Error deleting old profile picture:", err);
         });
       }
-      admin.profilePicture = req.file.path;
+      admin.profilePicture = `/uploads/${req.file.filename}`;
     }
 
     await admin.save();
@@ -167,5 +177,5 @@ exports.updateAdminProfile = async (req, res) => {
   }
 };
 
-// Profile picture update middleware
+// Profile picture update (use this for the file upload only)
 exports.uploadProfilePicture = upload.single("profilePicture");

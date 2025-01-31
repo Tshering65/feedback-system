@@ -51,7 +51,9 @@ const AdminDashboard = () => {
       try {
         const email = localStorage.getItem("email");
         const response = await axios.get(`/admin/profile/${email}`);
-        const profilePictureUrl = response.data.profilePicture || null;
+        const profilePictureUrl = response.data.profilePicture
+          ? `http://localhost:5000${response.data.profilePicture}`
+          : null;
         setAdminProfile({
           ...response.data,
           profilePicture: profilePictureUrl,
@@ -98,39 +100,13 @@ const AdminDashboard = () => {
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    
     const formData = new FormData();
     formData.append("email", email);
     formData.append("oldPassword", oldPassword);
-  
-    // Upload profile picture to Cloudinary
-    if (newProfilePicture) {
-      try {
-        const imageData = new FormData();
-        imageData.append("profilePicture", newProfilePicture);
-  
-        const imageUploadResponse = await axios.post(
-          "http://localhost:5000/admin/upload-profile-picture", // Backend route for image upload
-          imageData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
-  
-        const profilePictureUrl = imageUploadResponse.data.url; // Get the URL from Cloudinary
-  
-        formData.append("profilePicture", profilePictureUrl);
-      } catch (error) {
-        toast.error("Failed to upload profile picture");
-        return;
-      }
-    }
-  
-    // Upload updated profile info (email, password, and profile picture)
-    if (newPassword.trim() !== "") {
-      formData.append("newPassword", newPassword);
-    }
-  
+
+    if (newProfilePicture) formData.append("profilePicture", newProfilePicture);
+    if (newPassword.trim() !== "") formData.append("newPassword", newPassword);
+
     try {
       const response = await axios.put(
         "/admin/update-admin-profile",
@@ -139,7 +115,7 @@ const AdminDashboard = () => {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-  
+
       toast.success(response.data.message);
       setAdminProfile((prev) => ({
         ...prev,
@@ -151,8 +127,6 @@ const AdminDashboard = () => {
       toast.error(error.response?.data?.message || "Update failed");
     }
   };
-  
-  
 
   const handleToggleChange = (checked) => {
     setShowAnalytics(checked);
@@ -191,10 +165,10 @@ const AdminDashboard = () => {
           >
             {adminProfile.profilePicture ? (
               <img
-              src={adminProfile.profilePicture || "/icons/default-profile.png"}
-              alt="Profile"
-              className="profileImage"
-            />            
+                src={adminProfile.profilePicture}
+                alt="Profile"
+                className="profileImage"
+              />
             ) : (
               <FaUserCircle size={40} />
             )}

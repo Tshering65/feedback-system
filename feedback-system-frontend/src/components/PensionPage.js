@@ -81,39 +81,13 @@ const PensionPage = () => {
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    
     const formData = new FormData();
     formData.append("email", email);
     formData.append("oldPassword", oldPassword);
-  
-    // Upload profile picture to Cloudinary
-    if (newProfilePicture) {
-      try {
-        const imageData = new FormData();
-        imageData.append("profilePicture", newProfilePicture);
-  
-        const imageUploadResponse = await axios.post(
-          "http://localhost:5000/admin/upload-profile-picture", // Backend route for image upload
-          imageData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
-  
-        const profilePictureUrl = imageUploadResponse.data.url; // Get the URL from Cloudinary
-  
-        formData.append("profilePicture", profilePictureUrl);
-      } catch (error) {
-        toast.error("Failed to upload profile picture");
-        return;
-      }
-    }
-  
-    // Upload updated profile info (email, password, and profile picture)
-    if (newPassword.trim() !== "") {
-      formData.append("newPassword", newPassword);
-    }
-  
+
+    if (newProfilePicture) formData.append("profilePicture", newProfilePicture);
+    if (newPassword.trim() !== "") formData.append("newPassword", newPassword);
+
     try {
       const response = await axios.put(
         "/admin/update-admin-profile",
@@ -122,7 +96,7 @@ const PensionPage = () => {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-  
+
       toast.success(response.data.message);
       setAdminProfile((prev) => ({
         ...prev,
@@ -134,7 +108,6 @@ const PensionPage = () => {
       toast.error(error.response?.data?.message || "Update failed");
     }
   };
-  
 
   const fetchFeedbackDetails = async (emojiType) => {
     try {
